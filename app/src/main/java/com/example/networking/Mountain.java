@@ -1,5 +1,4 @@
 package com.example.networking;
-import androidx.annotation.NonNull;
 
 public class Mountain {
     private String name;
@@ -10,21 +9,10 @@ public class Mountain {
         this.location = "location";
         this.height = 0;
     }
-    public Mountain(String name, String location, int height) {
-        this.name = "name";
-        this.location = "location";
-        this.height = 0;
-    }
-    public void setName(String n) {
-        this.name=n;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public void setHeight(int height) {
-        this.height = height;
+    public Mountain(String n, String l, int h) {
+        this.name = n;
+        this.location = l;
+        this.height = h;
     }
 
     public String getName() {
@@ -38,7 +26,7 @@ public class Mountain {
     public int getHeight() {
         return height;
     }
-    @NonNull
+
     @Override
     public String toString() {
         return name;
