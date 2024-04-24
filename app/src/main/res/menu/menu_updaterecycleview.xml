@@ -5,9 +5,9 @@
         xmlns:tools="http://schemas.android.com/tools"
         tools:context="com.example.webviewapp.MainActivity">
         <item
-            android:id="@+id/action_external_web"
+            android:id="@+id/action_update_recyclerview"
             android:orderInCategory="100"
-            android:title="@string/updated_RecycleView"
+            android:title="@string/update_recyclerview"
             app:showAsAction="never" />
 
     </menu>
