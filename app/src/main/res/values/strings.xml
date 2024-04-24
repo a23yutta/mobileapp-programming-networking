@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Networking</string>
+    <string name="updated_RecycleView">Show updated RecycleView</string>
 </resources>
