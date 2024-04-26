@@ -1,42 +1,30 @@
 
 # Rapport
 
-**Skriv din rapport här!**
+Skapade en Mountain class som korrelerar med mountains.json och la till elementet RecyclerView i "activity_main.xml".
 
-_Du kan ta bort all text som finns sedan tidigare_.
+Skapade en RecyclerViewItem class samt definiera layouten för den i layout filen "recyclerview_item.xml"
+sedan skapades det en RecyclerViewAdapter class som en subclass av  RecyclerView.Adapter <RecyclerViewAdapter.ViewHolder>
+för att kunna uppdatera och visa innehållet i RecyclerView. 
 
-## Följande grundsyn gäller dugga-svar:
+Definierade så att en item (RecyclerViewItem) i RecyclerView motsvarade en Mountain object.
+Möjliggjorde att RecyclerView visade items från filen "mountains.json".
 
-- Ett kortfattat svar är att föredra. Svar som är längre än en sida text (skärmdumpar och programkod exkluderat) är onödigt långt.
-- Svaret skall ha minst en snutt programkod.
-- Svaret skall inkludera en kort övergripande förklarande text som redogör för vad respektive snutt programkod gör eller som svarar på annan teorifråga.
-- Svaret skall ha minst en skärmdump. Skärmdumpar skall illustrera exekvering av relevant programkod. Eventuell text i skärmdumpar måste vara läsbar.
-- I de fall detta efterfrågas, dela upp delar av ditt svar i för- och nackdelar. Dina för- respektive nackdelar skall vara i form av punktlistor med kortare stycken (3-4 meningar).
+Därefter la jag till en meny med alternativet "Update" för att kunna
+uppdatera RecyclerView.
 
-Programkod ska se ut som exemplet nedan. Koden måste vara korrekt indenterad då den blir lättare att läsa vilket gör det lättare att hitta syntaktiska fel.
+Sedan byttes url på JSON_URL till FamousPeaksJSON url i filen "MainActivity" för att hämta den nya json datan som ska visas i RecyclerView.
+Efter åt implementerades det kod i onPostExecute() som ska uppdatera innehållet i RecyclerView. 
 
+
+Kod på parsing av Json array "mountains.json" till ArrayList<Mountain> mountains:
 ```
-function errorCallback(error) {
-    switch(error.code) {
-        case error.PERMISSION_DENIED:
-            // Geolocation API stöds inte, gör något
-            break;
-        case error.POSITION_UNAVAILABLE:
-            // Misslyckat positionsanrop, gör något
-            break;
-        case error.UNKNOWN_ERROR:
-            // Okänt fel, gör något
-            break;
-    }
-}
+ new JsonFile(this, this).execute(JSON_FILE);
+ String s = readFile("mountains.json");
+ Gson gson = new Gson();
+ Type type = new TypeToken<List<Mountain>>() {}.getType();
+ mountains = gson.fromJson(s, type);
 ```
 
-Bilder läggs i samma mapp som markdown-filen.
+![](Screenshot_recyclerview.png)
 
-![](android.png)
-
-Läs gärna:
-
-- Boulos, M.N.K., Warren, J., Gong, J. & Yue, P. (2010) Web GIS in practice VIII: HTML5 and the canvas element for interactive online mapping. International journal of health geographics 9, 14. Shin, Y. &
-- Wunsche, B.C. (2013) A smartphone-based golf simulation exercise game for supporting arthritis patients. 2013 28th International Conference of Image and Vision Computing New Zealand (IVCNZ), IEEE, pp. 459–464.
-- Wohlin, C., Runeson, P., Höst, M., Ohlsson, M.C., Regnell, B., Wesslén, A. (2012) Experimentation in Software Engineering, Berlin, Heidelberg: Springer Berlin Heidelberg.
