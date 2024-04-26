@@ -12,18 +12,13 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.lang.reflect.Type;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.List;
 import java.util.Scanner;
 
 @SuppressWarnings("FieldCanBeLocal")
@@ -31,14 +26,10 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
 
     private final String JSON_URL = "https://mobprog.webug.se/json-api?login=brom";
     private final String JSON_FILE = "mountains.json";
-    /*ArrayList<Mountain> mountains = new ArrayList<>(Arrays.asList(
-            new Mountain("Mount Everest","Asia" ,8849),
-            new Mountain("Mont Blanc","Europe" ,4810),
-            new Mountain("Denali", "North America" ,6190)
-    ));
-     */
-    ArrayList<Mountain> mountains;
-    //Mountain[] mountains;
+    private RecyclerViewAdapter adapter;
+    private ArrayList<Mountain> mountains = new ArrayList<Mountain>();
+
+    private RecyclerView view;
     @SuppressWarnings("SameParameterValue")
     private String readFile(String fileName) {
         try {
@@ -59,32 +50,48 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
 
         new JsonFile(this, this).execute(JSON_FILE);
         String s = readFile("mountains.json");
-        Log.d("MainActivity","The following text was found in textfile:\n\n"+s);
 
         Gson gson = new Gson();
+        Type type = new TypeToken<List<Mountain>>() {}.getType();
+        List<Mountain>listOfMountains = gson.fromJson(s, type);
+        assert listOfMountains != null;
+        mountains.addAll(listOfMountains);
 
-        mountains = gson.fromJson(s, ArrayList.class);
-
-        RecyclerViewAdapter adapter = new RecyclerViewAdapter(this, mountains, new RecyclerViewAdapter.OnClickListener() {
+        view = findViewById(R.id.recycler_view_);
+        view.setLayoutManager((new LinearLayoutManager(this)));
+        adapter = new RecyclerViewAdapter(this, mountains, new RecyclerViewAdapter.OnClickListener() {
             @Override
             public void onClick(Mountain items) {
                 Toast.makeText(MainActivity.this, mountains.toString(), Toast.LENGTH_SHORT).show();
             }
         });
-        RecyclerView view = findViewById(R.id.recycler_view_);
-        view.setLayoutManager((new LinearLayoutManager(this)));
         view.setAdapter(adapter);
     }
 
     @Override
     public void onPostExecute(String json) {
         Log.d("MainActivity", json);
-        /*Gson gson = new Gson();
-        mountains = gson.fromJson(json, ArrayList.class);
-        for(int i = 0; i < mountains.size(); i++){
-            Log.d("hej", "Nya berg" + mountains.get(i).getName());
-        }*/
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Mountain>>() {}.getType();
+        List<Mountain>newListOfMountains = gson.fromJson(json, type);
+        mountains = new ArrayList<Mountain>();
+        for(int i = 0; i < newListOfMountains.size(); i++) {
+            mountains.add(newListOfMountains.get(i));
+            Log.d("MainActivity", "new mountains" + mountains.get(i));
+        }
+        adapter.notifyDataSetChanged();
+        /*adapter = new RecyclerViewAdapter(MainActivity.this, newMountains, new RecyclerViewAdapter.OnClickListener() {
+            @Override
+            public void onClick(Mountain items) {
+                Toast.makeText(MainActivity.this, newMountains.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
+         */
 
+        //this.view.setAdapter(adapter);
+        //view.setAdapter(adapter);
+        adapter.notifyDataSetChanged();
+        //adapter.notifyDataSetChanged();
     }
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -94,23 +101,11 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == R.id.action_update_recyclerview) {
-            //onPostExecute(JSON_URL);
-            //new JsonTask(this).execute(JSON_URL);
-            String s = readFile("mountains.json");
-            Log.d("MainActivity","The following text was found in textfile:\n\n"+s);
+            new JsonTask(this).execute(JSON_URL);
 
-            /*Gson gson = new Gson();
-            mountains = gson.fromJson(s, ArrayList.class);
-
-             */
             Log.d("==>","Update RecyclerView");
             return true;
-
-
-
-
         }
         return super.onOptionsItemSelected(item);
     }
