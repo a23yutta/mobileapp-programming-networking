@@ -23,13 +23,12 @@ import java.util.Scanner;
 
 @SuppressWarnings("FieldCanBeLocal")
 public class MainActivity extends AppCompatActivity implements JsonTask.JsonTaskListener {
-
     private final String JSON_URL = "https://mobprog.webug.se/json-api?login=brom";
     private final String JSON_FILE = "mountains.json";
-    private RecyclerViewAdapter adapter;
     private ArrayList<Mountain> mountains = new ArrayList<Mountain>();
-
     private RecyclerView view;
+    private RecyclerViewAdapter adapter;
+
     @SuppressWarnings("SameParameterValue")
     private String readFile(String fileName) {
         try {
@@ -40,25 +39,57 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
             return null;
         }
     }
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
-
-        new JsonFile(this, this).execute(JSON_FILE);
-        String s = readFile("mountains.json");
-
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<Mountain>>() {}.getType();
-        List<Mountain>listOfMountains = gson.fromJson(s, type);
-        assert listOfMountains != null;
-        mountains.addAll(listOfMountains);
+        adapter = new RecyclerViewAdapter(this, mountains, new RecyclerViewAdapter.OnClickListener() {
+            @Override
+            public void onClick(Mountain items) {
+                Toast.makeText(MainActivity.this, mountains.toString(), Toast.LENGTH_SHORT).show();
+            }
+        });
 
         view = findViewById(R.id.recycler_view_);
         view.setLayoutManager((new LinearLayoutManager(this)));
+        view.setAdapter(adapter);
+
+        new JsonFile(this, this).execute(JSON_FILE);
+        String s = readFile("mountains.json");
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Mountain>>() {
+        }.getType();
+        mountains = gson.fromJson(s, type);
+
+    }
+    private void getJson() {
+        new JsonTask(this).execute(JSON_URL);
+    }
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.menu_updaterecycleview, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.action_update_recyclerview) {
+            getJson();
+            Log.d("==>", "Update RecyclerView");
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onPostExecute(String json) {
+        Gson gson = new Gson();
+        Type type = new TypeToken<List<Mountain>>() {}.getType();
+        mountains = gson.fromJson(json, type);
+        Log.d("MainActivity", "new mountains" + mountains.size());
         adapter = new RecyclerViewAdapter(this, mountains, new RecyclerViewAdapter.OnClickListener() {
             @Override
             public void onClick(Mountain items) {
@@ -66,47 +97,8 @@ public class MainActivity extends AppCompatActivity implements JsonTask.JsonTask
             }
         });
         view.setAdapter(adapter);
-    }
-
-    @Override
-    public void onPostExecute(String json) {
-        Log.d("MainActivity", json);
-        Gson gson = new Gson();
-        Type type = new TypeToken<List<Mountain>>() {}.getType();
-        List<Mountain>newListOfMountains = gson.fromJson(json, type);
-        mountains = new ArrayList<Mountain>();
-        for(int i = 0; i < newListOfMountains.size(); i++) {
-            mountains.add(newListOfMountains.get(i));
-            Log.d("MainActivity", "new mountains" + mountains.get(i));
-        }
         adapter.notifyDataSetChanged();
-        /*adapter = new RecyclerViewAdapter(MainActivity.this, newMountains, new RecyclerViewAdapter.OnClickListener() {
-            @Override
-            public void onClick(Mountain items) {
-                Toast.makeText(MainActivity.this, newMountains.toString(), Toast.LENGTH_SHORT).show();
-            }
-        });
-         */
 
-        //this.view.setAdapter(adapter);
-        //view.setAdapter(adapter);
-        adapter.notifyDataSetChanged();
-        //adapter.notifyDataSetChanged();
-    }
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_updaterecycleview, menu);
-        return true;
-    }
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.action_update_recyclerview) {
-            new JsonTask(this).execute(JSON_URL);
 
-            Log.d("==>","Update RecyclerView");
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 }
