@@ -29,6 +29,10 @@ public class Mountain {
         return size;
     }
 
+    public Auxdata getAuxdata() {
+        return auxdata;
+    }
+
     @Override
     public String toString() {
         return name;
